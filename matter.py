@@ -1,7 +1,9 @@
 import utils
 from utils import WordStatus
 import docx
-from nltk.tokenize import word_tokenize
+from nltk.tokenize import word_tokenize, sent_tokenize
+import os
+import sys
 
 class Matter:
     def __init__(self, path) -> None:
@@ -22,8 +24,9 @@ class Matter:
         first_name, last_name = client_name.split()
         for idx, para in enumerate(self.paragraphs):
             if not self.CheckName(para, first_name, last_name):
-                print(f"paragraph: {idx} client name wrong")
-                print(para.text)
+                print(f"[ERROR] paragraph: {idx}, {para.text}")
+                return False
+        return True
 
     def CheckName(self, para, client_first_name, client_last_name):
         # Attorney ShuKui GAO
@@ -44,22 +47,47 @@ class Matter:
                     if last_name_flag == WordStatus.WORD_SPELL_CORRECT:
                         pass
                     else:
-                        print(f"Client last name spell wrong, {client_last_name}")
+                        print(f"[ERROR] Client last name spell wrong, {client_last_name}")
                         return False
                 elif first_name_flag == WordStatus.WORD_SPELL_WRONG:
-                    print(f"Client first name spell wrong, {words[i]}")
+                    print(f"[ERROR] Client first name spell wrong, {words[i]}")
                     return False
             elif attorney_flag == WordStatus.WORD_SPELL_WRONG:
-                print(f"Attorney spell wrong")
+                print(f"[ERROR] Attorney spell wrong")
                 return False
             else:
                 pass
         return True
-                    
-                
+
+    def CheckPunctuation(self):
+        for idx, para in enumerate(self.paragraphs):
+            sentences = sent_tokenize(para.text)
+            for sentence in sentences:
+                words = word_tokenize(sentence)
+                if not utils.IsValidParaPunctuation(words):
+                    print(f"[ERROR] Use Chinese punctuation!!!, paragraph id: {idx}, sentence: {sentence}")
+                    return False
+        return True
 
 
 if __name__ == "__main__":
-    matter = Matter(r'/Users/qiujiankun/Python_project/WordFileDetection/【Shirley】【完善版】高淑奎PM3-4.docx')
-    matter.CheckClientName('ShuKui GAO')
+    document_path = input(r"Please Input document file path: ")
+    if not os.path.exists(document_path):
+        print(f"{document_path} File Path does not exits. Please check!!!")
+        sys.exit(0)
+    client_name = input("Please Input Client Name (e.g. ShuKui GAO): ")
+    client_name_check = input("Please ReInput Client Name: ")
+    client_name = client_name.strip()
+    client_name_check = client_name_check.strip()
+    if client_name != client_name_check:
+        print(f"Client Name input mismatch. Please re-input the client name")
+        sys.exit(0)
+    
+    matter = Matter(document_path)
+    if matter.CheckClientName(client_name):
+        print(f"[Success] Client Name spell Correct!!! Congrats!")
+    if matter.CheckPunctuation():
+        print(f"[Success] No punctuation error!!! Congrats!")
+    
+    sys.exit(0)
 

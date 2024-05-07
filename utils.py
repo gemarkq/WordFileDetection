@@ -54,12 +54,17 @@ def IsWordValid(word, pattern):
     else:
         return WordStatus.WORD_TOTALLY_DIFFERENT
 
-def IsValidPunctuation(word):
+def IsValidWordPunctuation(word):
     if word in punctuation:
         return False
     return True
 
-
+def IsValidParaPunctuation(para):
+    for word in para:
+        if word in punctuation:
+            return False
+        else:
+            return True
 
         
 
