@@ -1,7 +1,6 @@
 from enum import Enum
 import numpy as np
 from zhon.hanzi import punctuation
-import docx
 
 """
 return Type:
@@ -63,8 +62,28 @@ def IsValidParaPunctuation(para):
     for word in para:
         if word in punctuation:
             return False
-        else:
-            return True
+    return True
 
-        
+def IsValidWordPuctExclude(word):
+    punct_exclude = "“”‘’–"
+    for char in word:
+        if char in punct_exclude:
+            continue
+        if char in punctuation:
+            return False
+    return True
+
+def IsChineseWord(word):
+    if '\u4e00' <= word <= '\u9fa5':
+        return True
+    return False
+
+def IsConatinChinese(sentence):
+    for word in sentence:
+        if '\u4e00' <= word <= '\u9fa5':
+            return True
+    return False
+
+def SeperateLine():
+    print("\n---------------------------------------------------------------------------------------------\n")
 
