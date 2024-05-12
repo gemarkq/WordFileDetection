@@ -116,6 +116,52 @@ class Matter:
             return False
         return True
 
+    def CheckIfSingleQuat(self, idx, sentence):
+        s_before_word = "@"
+        s_after_word = "#"
+        space = "%"
+        if idx > 0:
+            s_before_word = sentence[idx - 1]
+        if idx < len(sentence) - 2:
+            space = sentence[idx + 2]
+            s_after_word = sentence[idx + 1]
+        
+        flag1 = s_before_word == 's' and s_after_word == ' '
+        flag2 = s_after_word == 's' and space == ' '
+        return flag1 or flag2
+    
+    def CheckQuatationPair(self):
+        stack_dq = []
+        stack_sq = []
+        flag = False
+        tao_flag = False
+        for idx, para in enumerate(self.paragraphs):
+            sentences = sent_tokenize(para.text)
+            for sentence in sentences:
+                flag = False
+                for idx, char in enumerate(sentence):
+                    if char == "“":
+                        stack_dq.append(char)
+                    elif char == "”":
+                        if len(stack_dq) == 0:
+                            flag = True
+                        else:
+                            stack_dq.pop()
+                    if char == "‘":
+                        stack_sq.append(char)
+                    elif char == "’":
+                        if self.CheckIfSingleQuat(idx, sentence):
+                            continue
+                        if len(stack_sq) == 0:
+                            flag = True
+                        else:
+                            stack_sq.pop()
+                if flag:
+                    tao_flag = True
+                    print(f"[Error] Quatation is not Paired In Sentence: {sentence}")
+        if tao_flag:
+            return False
+        return True
 
 if __name__ == "__main__":
     document_path = input(r"Please Input document file path: ").strip()
@@ -153,6 +199,12 @@ if __name__ == "__main__":
     print("CHINESE PUNCTUATION CHECK BEGIN")
     if matter.CheckPunctuation():
         print(f"[Success] No punctuation error!!! Congrats!")
+    
+    utils.SeperateLine()
+
+    print("CHEKC QUATATION PAIR BEGIN")
+    if matter.CheckQuatationPair():
+        print(f"[Success] All Quatations Paired!!!Congrats!")
     
     utils.SeperateLine()
 
