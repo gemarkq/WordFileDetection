@@ -4,7 +4,7 @@ import docx
 from nltk.tokenize import word_tokenize, sent_tokenize
 import os
 import sys
-from zhon.hanzi import punctuation
+from num2words import num2words
 
 class Matter:
     def __init__(self, path) -> None:
